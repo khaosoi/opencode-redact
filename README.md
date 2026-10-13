@@ -117,6 +117,18 @@ npm run build     # tsc -> dist/
 npm test          # build + node --test
 ```
 
+## Credits
+
+This is a fork of [opencode-redact](https://github.com/kkchengg/opencode-redact)
+by **kk Cheng** ([@kkchengg](https://github.com/kkchengg)), MIT-licensed. The
+two-way redaction design, the `[REDACTED:<rule>:<fingerprint>]` placeholder
+format, the detection rules, hooks, rehydration, and the deep-walking redactor
+are all the original author's work.
+
+This fork's only addition so far is the `*KEY` environment-variable seeding
+(described above) and its tests. Everything else is upstream, unchanged.
+
 ## License
 
-[MIT](./LICENSE)
+[MIT](./LICENSE) — © kk Cheng, the original opencode-redact author.
+The fork's additions inherit the same MIT licence.

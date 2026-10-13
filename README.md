@@ -55,7 +55,7 @@ need no config entry.
 ## Detected secrets
 
 | Rule | Matches |
-|------|---------|
+| ------ | --------- |
 | `aws-access-key` | `AKIA…`, `ASIA…`, `AGPA…`, … |
 | `gcp-api-key` | `AIza…` |
 | `github-pat` | `ghp_`, `gho_`, `ghu_`, `ghs_`, `ghr_` |
@@ -70,6 +70,22 @@ need no config entry.
 | `jwt` | three dot-separated base64url segments starting `eyJ` |
 | `private-key` | PEM `-----BEGIN … PRIVATE KEY-----` blocks |
 | `credential` | `password: …`, `api_key=…`, `secret=…`, `token: …` |
+
+### `*KEY` environment variables
+
+At startup the plugin registers the values of every environment variable whose
+name ends in `KEY` (minimum 8 characters). Any occurrence of those exact values
+— pasted into the prompt, echoed by a tool (`printenv`) or shown in a file — is
+replaced before it reaches the model, and rehydrated just before a tool runs:
+
+```text
+printenv STRIPE_KEY   →   the model sees [REDACTED:env-stripe-key:0000c281e114]
+```
+
+Tokens for seeded variables are deterministic fingerprints of the value and are
+re-registered on every plugin load, so placeholders from earlier history keep
+rehydrating across `opencode service restart` for as long as the variable
+remains in the environment.
 
 ## Coverage & limits
 

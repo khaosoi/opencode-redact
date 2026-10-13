@@ -91,6 +91,24 @@ function remember(rule: string, secret: string): string {
 const TOKEN_RE = /\[REDACTED:[a-z0-9-]+:[0-9a-f]{12}\]/g
 
 /**
+ * Pre-seeded secrets: values of environment variables whose names end in
+ * "KEY". Because the token is a deterministic fingerprint of the value,
+ * re-seeding on every load also restores rehydration after a service
+ * restart: old history placeholders map to the same token again.
+ */
+const seeded = new Map<string, string>() // secret value -> token
+
+function seedEnvKeys(): void {
+  for (const [name, value] of Object.entries(process.env)) {
+    if (!value || value.length < 8) continue
+    if (!name.toUpperCase().endsWith("KEY")) continue
+    if (isOpaque(value)) continue
+    const token = remember(`env-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`, value)
+    seeded.set(value, token)
+  }
+}
+
+/**
  * Replace secrets with tokens. Every rule scans the original text, so no rule
  * can match inside another rule's token. Ranges already covered by a token
  * (a secret re-sent on a later turn) are reserved so the generic assignment
@@ -106,8 +124,22 @@ function redactString(text: string): string {
     reserved.push([start, start + match[0].length])
   }
   const overlaps = (start: number, end: number) => reserved.some(([a, b]) => start < b && end > a)
-
   const edits: Array<{ start: number; end: number; token: string }> = []
+
+  // Exact matches for pre-seeded env-var values. These run before the shape
+  // rules so a rule cannot match inside or around a seeded span.
+  for (const [secret, token] of seeded) {
+    let from = 0
+    for (;;) {
+      const at = text.indexOf(secret, from)
+      if (at < 0) break
+      from = at + secret.length
+      if (overlaps(at, at + secret.length)) continue
+      reserved.push([at, at + secret.length])
+      edits.push({ start: at, end: at + secret.length, token })
+    }
+  }
+
   for (const rule of RULES) {
     rule.re.lastIndex = 0
     for (const match of text.matchAll(rule.re)) {
@@ -227,6 +259,10 @@ function rehydrateValue(value: unknown): unknown {
 export default {
   id: "opencode-redact",
   async setup(ctx: any) {
+    // 0. Pre-seed values of *KEY env vars so exact occurrences anywhere in
+    //    the conversation are redacted even without a credential shape.
+    seedEnvKeys()
+
     // 1. Redact the user's prompt at admission.
     await ctx.session.hook("prompt", (event: any) => {
       if (typeof event.prompt?.text === "string") {

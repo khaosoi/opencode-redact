@@ -4,8 +4,7 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md)
 
-[![npm](https://img.shields.io/npm/v/%40kkchengg%2Fopencode-redact)](https://www.npmjs.com/package/@kkchengg/opencode-redact)
-[![license](https://img.shields.io/npm/l/%40kkchengg%2Fopencode-redact)](./LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 `opencode-redact` replaces API keys, tokens, passwords and other secrets in your
 OpenCode conversation with stable placeholders **before** they are sent to the
@@ -38,19 +37,28 @@ secret always yields the same token, so the model can still refer to it.
 
 ## Install
 
-**From npm**
+This fork is **not published to npm** (unlike the upstream project), so it can
+only be installed as a local plugin.
+
+**Global drop-in** — copy `src/index.ts` to
+`~/.config/opencode/plugins/redact/index.ts`. Global plugins are auto-loaded
+and need no config entry.
+
+**Project-level drop-in** — copy `src/index.ts` to `.opencode/plugins/redact.ts`
+in the project.
+
+Alternatively, point your config at a checkout of this repo:
 
 ```jsonc
 // ~/.config/opencode/opencode.json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["@kkchengg/opencode-redact@latest"]
+  "plugins": ["/absolute/path/to/opencode-redact/src/index.ts"]
 }
 ```
 
-**As a local drop-in file** — copy `src/index.ts` to
-`~/.config/opencode/plugins/redact/index.ts`. Global plugins are auto-loaded and
-need no config entry.
+Restart OpenCode (or run `opencode service restart`) after copying or changing
+the file.
 
 ## Detected secrets
 

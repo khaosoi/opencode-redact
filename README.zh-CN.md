@@ -4,8 +4,7 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md)
 
-[![npm](https://img.shields.io/npm/v/%40kkchengg%2Fopencode-redact)](https://www.npmjs.com/package/@kkchengg/opencode-redact)
-[![license](https://img.shields.io/npm/l/%40kkchengg%2Fopencode-redact)](./LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 `opencode-redact` 会在你的 OpenCode 对话中，于内容**发送给模型之前**，把 API 密钥、令牌、密码等密钥替换为稳定的占位符；随后在**工具执行之前**把占位符还原成真实值。模型永远看不到密钥，但工具仍能拿到真值。
 
@@ -29,17 +28,24 @@ OpenCode v2 更换了插件 API，因此 `opencode-vibeguard` 这类 V1 隐私�
 
 ## 安装
 
-**从 npm 安装**
+此 fork **尚未发布到 npm**(与上游项目不同),因此只能以本地插件方式安装。
+
+**全局直接放入** — 将 `src/index.ts` 复制到
+`~/.config/opencode/plugins/redact/index.ts`。全局插件会自动加载,无需配置文件条目。
+
+**项目级直接放入** — 将 `src/index.ts` 复制到项目中的 `.opencode/plugins/redact.ts`。
+
+另一种做法是让配置文件指向本 repo 的 checkout:
 
 ```jsonc
 // ~/.config/opencode/opencode.json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["@kkchengg/opencode-redact@latest"]
+  "plugins": ["/opencode-redact/src/index.ts 的绝对路径"]
 }
 ```
 
-**作为本地文件直接放入** — 将 `src/index.ts` 复制到 `~/.config/opencode/plugins/redact/index.ts`。全局插件会自动加载，无需配置文件条目。
+复制或修改文件后,请重新启动 OpenCode(或执行 `opencode service restart`)。
 
 ## 会检测的密钥
 

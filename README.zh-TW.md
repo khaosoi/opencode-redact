@@ -4,8 +4,7 @@
 
 [English](README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md)
 
-[![npm](https://img.shields.io/npm/v/%40kkchengg%2Fopencode-redact)](https://www.npmjs.com/package/@kkchengg/opencode-redact)
-[![license](https://img.shields.io/npm/l/%40kkchengg%2Fopencode-redact)](./LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 `opencode-redact` 會在你的 OpenCode 對話中，於內容**送出給模型之前**，把 API 金鑰、令牌、密碼等密鑰替換成穩定的佔位符；接著在**工具執行之前**把佔位符還原成真正的值。模型永遠看不到密鑰，但工具仍然能拿到真值。
 
@@ -29,17 +28,24 @@ OpenCode v2 更換了外掛 API，因此像 `opencode-vibeguard` 這類 V1 隱�
 
 ## 安裝
 
-**從 npm 安裝**
+此 fork **尚未發佈到 npm**(與上游專案不同),因此只能以本機外掛方式安裝。
+
+**全域直接放入** — 將 `src/index.ts` 複製到
+`~/.config/opencode/plugins/redact/index.ts`。全域外掛會自動載入,不需設定檔項目。
+
+**專案層級直接放入** — 將 `src/index.ts` 複製到專案中的 `.opencode/plugins/redact.ts`。
+
+另一種做法是讓設定檔指向本 repo 的 checkout:
 
 ```jsonc
 // ~/.config/opencode/opencode.json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["@kkchengg/opencode-redact@latest"]
+  "plugins": ["/opencode-redact/src/index.ts 的絕對路徑"]
 }
 ```
 
-**以本機檔案直接放入** — 將 `src/index.ts` 複製到 `~/.config/opencode/plugins/redact/index.ts`。全域外掛會自動載入，不需設定檔項目。
+複製或修改檔案後,請重新啟動 OpenCode(或執行 `opencode service restart`)。
 
 ## 會偵測的密鑰
 
